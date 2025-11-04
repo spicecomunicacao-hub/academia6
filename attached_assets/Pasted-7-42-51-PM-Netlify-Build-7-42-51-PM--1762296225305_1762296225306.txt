@@ -1,0 +1,75 @@
+7:42:51 PM: Netlify Build                                                 
+7:42:51 PM: ────────────────────────────────────────────────────────────────
+7:42:51 PM: ​
+7:42:51 PM: ❯ Version
+7:42:51 PM:   @netlify/build 35.3.1
+7:42:51 PM: ​
+7:42:51 PM: ❯ Flags
+7:42:51 PM:   accountId: 68b60292a25f07d86c650318
+7:42:51 PM:   baseRelDir: true
+7:42:51 PM:   buildId: 690a8157a18b1100b836ba9e
+7:42:51 PM:   deployId: 690a8157a18b1100b836baa0
+7:42:52 PM: ​
+7:42:52 PM: ❯ Current directory
+7:42:52 PM:   /opt/build/repo
+7:42:52 PM: ​
+7:42:52 PM: ❯ Config file
+7:42:52 PM:   /opt/build/repo/netlify.toml
+7:42:52 PM: ​
+7:42:52 PM: ❯ Context
+7:42:52 PM:   production
+7:42:52 PM: ​
+7:42:52 PM: build.command from netlify.toml                               
+7:42:52 PM: ────────────────────────────────────────────────────────────────
+7:42:52 PM: ​
+7:42:52 PM: $ npm install && npm run build
+7:42:53 PM: Failed during stage 'building site': Build script returned non-zero exit code: 2 (https://ntl.fyi/exit-code-2)
+7:42:53 PM: up to date, audited 639 packages in 1s
+7:42:53 PM: 103 packages are looking for funding
+7:42:53 PM:   run `npm fund` for details
+7:42:53 PM: 3 low severity vulnerabilities
+7:42:53 PM: To address all issues, run:
+7:42:53 PM:   npm audit fix
+7:42:53 PM: Run `npm audit` for details.
+7:42:53 PM: > rest-express@1.0.0 build
+7:42:53 PM: > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+7:42:53 PM: sh: 1: vite: not found
+7:42:53 PM: ​
+7:42:53 PM: "build.command" failed                                        
+7:42:53 PM: ────────────────────────────────────────────────────────────────
+7:42:53 PM: ​
+7:42:53 PM:   Error message
+7:42:53 PM:   Command failed with exit code 127: npm install && npm run build (https://ntl.fyi/exit-code-127)
+7:42:53 PM: ​
+7:42:53 PM:   Error location
+7:42:53 PM:   In build.command from netlify.toml:
+7:42:53 PM:   npm install && npm run build
+7:42:53 PM: ​
+7:42:53 PM:   Resolved config
+7:42:53 PM:   build:
+7:42:53 PM:     command: npm install && npm run build
+7:42:53 PM:     commandOrigin: config
+7:42:53 PM:     environment:
+7:42:53 PM:       - DATABASE_URL
+7:42:53 PM:       - NODE_ENV
+7:42:53 PM:       - NODE_VERSION
+7:42:53 PM:     publish: /opt/build/repo/dist/public
+7:42:53 PM:     publishOrigin: config
+7:42:53 PM:   functionsDirectory: /opt/build/repo/netlify/functions
+7:42:53 PM:   redirects:
+7:42:53 PM:     - from: /api/admin/*
+      status: 200
+      to: /.netlify/functions/admin/:splat
+    - from: /api/auth/*
+      status: 200
+      to: /.netlify/functions/auth/:splat
+    - from: /api/*
+      status: 200
+      to: /.netlify/functions/:splat
+    - from: /*
+      status: 200
+      to: /index.html
+  redirectsOrigin: config
+7:42:53 PM: Build failed due to a user error: Build script returned non-zero exit code: 2
+7:42:53 PM: Failing build: Failed to build site
+7:42:54 PM: Finished processing build request in 20.78s

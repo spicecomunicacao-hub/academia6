@@ -1,9 +1,10 @@
 [build]
   publish = "dist/public" 
-  command = "npm install && npm run build"
+  command = "npm install --include=dev && npx vite build && npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist"
   
 [build.environment]
   NODE_VERSION = "18"
+  NPM_FLAGS = "--include=dev"
 
 [functions]
   directory = "netlify/functions"

@@ -1,0 +1,115 @@
+The Netlify deploy errored, with the following guidance provided:
+
+- Relevant log lines
+  - Build script that runs the error: [line 67](#L67) shows the build script invoking Vite and esbuild.
+  - The actual failure: [line 69](#L69) reports `sh: 1: vite: not found`.
+  - The overall failed command: [line 75](#L75) (npm ci && npm run build) failed after that.
+
+- Error type and cause
+  - Error: CLI exit code 127 (command not found). The build tries to run `vite build` but the vite CLI is not available in the build environment ([line 69](#L69)).
+  - Cause: Vite is not installed / not available at build time. This usually happens because:
+    - vite is not listed in package.json, or
+    - vite is only present as a devDependency but Netlify is not installing devDependencies (e.g., NPM_CONFIG_PRODUCTION=true or using an npm install flag that excludes devDeps), or
+    - package.json / package-lock.json changes were not committed so npm ci didn't install the expected packages.
+
+- Concrete solution (step‑by‑step)
+  1. Verify vite is declared in your repo
+     - Open your repository package.json to confirm vite is listed under devDependencies or dependencies:
+       https://github.com/spicecomunicacao-hub/academia6/blob/main/package.json
+     - If vite is missing, add it locally and commit both package.json and package-lock.json:
+       ```bash
+       # add vite as a dev dependency, then commit changes
+       npm install --save-dev vite
+       git add package.json package-lock.json
+       git commit -m "chore: add vite devDependency"
+       git push
+       ```
+  2. If vite is present but the build still fails, ensure Netlify installs devDependencies
+     - Check Netlify environment variables in the site settings. If NPM_CONFIG_PRODUCTION is set to true (or production-only install is otherwise enabled), devDependencies will be skipped and the vite CLI will not be installed.
+     - Two options:
+       - Allow devDependencies to be installed (recommended for build tools):
+         - Remove or set NPM_CONFIG_PRODUCTION to false in Netlify UI (Site settings → Build & deploy → Environment).
+       - Or explicitly install devDependencies in the build by changing your build command in netlify.toml (or Netlify UI) to include dev deps:
+         ```toml
+         # example netlify.toml build command
+         [build]
+           command = "npm ci --include=dev && npm run build"
+         ```
+       - Alternatively, move vite from devDependencies to dependencies if you prefer it always be installed (less common).
+  3. Ensure lockfile and package.json are committed
+     - Netlify runs `npm ci`, which uses package-lock.json. Make sure package-lock.json is committed and up to date after installing vite.
+  4. Re-trigger a deploy
+     - After making and pushing the changes above, re-deploy the site on Netlify. The `vite` binary should now be installed and the `vite build` step will run.
+
+If you want, tell me whether vite appears in your package.json and I’ll give the exact change needed.
+
+The relevant error logs are:
+
+Line 0: Waiting for other deploys from your team to complete. Check the queue: https://app.netlify.com/teams/spice-comunicacao/builds
+Line 1: build-image version: 0885bcbb999ebd19472160b218ceb07f99c4e7d1 (noble)
+Line 2: buildbot version: 1049fb5a2bbbd0b9929a4139d52a218b72b00555
+Line 3: Fetching cached dependencies
+Line 4: Failed to fetch cache, continuing with build
+Line 5: Starting to prepare the repo for build
+Line 6: No cached dependencies found. Cloning fresh repo
+Line 7: git clone --filter=blob:none https://github.com/spicecomunicacao-hub/academia6
+Line 8: Preparing Git Reference refs/heads/main
+Line 9: Custom build command detected. Proceeding with the specified command: 'npm ci && npm run build'
+Line 10: Starting to install dependencies
+Line 11: Downloading and installing node v18.20.8...
+Line 12: Downloading https://nodejs.org/dist/v18.20.8/node-v18.20.8-linux-x64.tar.xz...
+Line 13: Computing checksum with sha256sum
+Line 14: Checksums matched!
+Line 49: [36m[1m❯ Config file[22m[39m
+Line 50:   /opt/build/repo/netlify.toml
+Line 51: [36m[1m​[22m[39m
+Line 52: [36m[1m❯ Context[22m[39m
+Line 53:   production
+Line 54: [96m[1m​[22m[39m
+Line 55: [96m[1mbuild.command from netlify.toml                               [22m[39m
+Line 56: [96m[1m────────────────────────────────────────────────────────────────[22m[39m
+Line 57: ​
+Line 58: [36m$ npm ci && npm run build[39m
+Line 59: Failed during stage 'building site': Build script returned non-zero exit code: 2
+Line 60: added 638 packages, and audited 639 packages in 6s
+Line 61: 103 packages are looking for funding
+Line 62:   run `npm fund` for details
+Line 63: 3 low severity vulnerabilities
+Line 64: To address all issues, run:
+Line 65:   npm audit fix
+Line 66: Run `npm audit` for details.
+Line 67: > rest-express@1.0.0 build
+Line 68: > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+Line 69: sh: 1: vite: not found
+Line 70: [91m[1m​[22m[39m
+Line 71: [91m[1m"build.command" failed                                        [22m[39m
+Line 72: [91m[1m────────────────────────────────────────────────────────────────[22m[39m
+Line 73: ​
+Line 74:   [31m[1mError message[22m[39m
+Line 75:   Command failed with exit code 127: npm ci && npm run build
+Line 76: ​
+Line 77:   [31m[1mError location[22m[39m
+Line 78:   In build.command from netlify.toml:
+Line 79:   npm ci && npm run build
+Line 80: ​
+Line 81:   [31m[1mResolved config[22m[39m
+Line 82:   build:
+Line 83:     command: npm ci && npm run build
+Line 84:     commandOrigin: config
+Line 85:     environment:
+Line 86:       - DATABASE_URL
+Line 87:       - NODE_ENV
+Line 88:       - NODE_VERSION
+Line 89:     publish: /opt/build/repo/dist/public
+Line 90:     publishOrigin: config
+Line 91:   functionsDirectory: /opt/build/repo/netlify/functions
+Line 92:   redirects:
+Line 93:     - from: /api/admin/*
+      status: 200
+      to: /.netlify/functions/admin/:splat
+    - from: /api/auth/*
+      status: 200
+
+Line 94: Build failed due to a user error: Build script returned non-zero exit code: 2
+Line 95: Failing build: Failed to build site
+Line 96: Finished processing build request in 23.083s

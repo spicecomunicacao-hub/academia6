@@ -1,6 +1,6 @@
 [build]
   publish = "dist/public" 
-  command = "npm ci && npx vite build && npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist"
+  command = "npm ci && npm run build"
   
 [build.environment]
   NODE_VERSION = "18"
